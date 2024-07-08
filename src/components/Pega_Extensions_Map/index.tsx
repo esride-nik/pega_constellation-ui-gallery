@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   withConfiguration,
   useTheme,
@@ -17,6 +18,30 @@ import Sketch from '@arcgis/core/widgets/Sketch';
 import { useEffect, useRef } from 'react';
 import { StyledClearBtn, StyledPegaExtensionsMap } from './styles';
 import { getAllFields, createGraphic, deletePoints, addPoint, addScreenShot } from './utils';
+
+// Redux stuff
+import { configureStore, type EnhancedStore } from '@reduxjs/toolkit';
+// import rootReducer from './reducers'
+// const store = configureStore({ reducer: rootReducer })
+
+interface MapState {
+  todos: any[];
+  visibilityFilter: string;
+}
+
+const preloadedState: MapState = {
+  todos: [
+    {
+      text: 'Eat food',
+      completed: true
+    },
+    {
+      text: 'Exercise',
+      completed: false
+    }
+  ],
+  visibilityFilter: 'SHOW_COMPLETED'
+};
 
 type MapProps = {
   getPConnect?: any;
@@ -59,6 +84,12 @@ export const PegaExtensionsMap = (props: MapProps) => {
   const btnClearRef = useRef<HTMLButtonElement>(null);
   const numPoints = useRef<number>(0);
   const isLastActionClear = useRef<boolean>(false);
+  // const store = useRef<EnhancedStore>(null);
+
+  const store = configureStore({
+    reducer: () => {},
+    preloadedState
+  });
 
   // Checks if the last vertex is making the line intersect itself.
   const updateVertices = (vars: VerticesProps) => {
@@ -103,6 +134,18 @@ export const PegaExtensionsMap = (props: MapProps) => {
   /**
    * Initialize application
    */
+  // useEffect(() => {
+  //   store.current = configureStore({
+  //     reducer: () => {},
+  //     preloadedState
+  //   });
+  //   console.log('store', store);
+  // }, []);
+
+  useEffect(() => {
+    console.log('store', store);
+  }, [store]);
+
   useEffect(() => {
     const tmpFields: any = getAllFields(getPConnect);
 
@@ -266,7 +309,9 @@ export const PegaExtensionsMap = (props: MapProps) => {
   return (
     <Card>
       <CardHeader>
-        <Text variant='h2'>{heading}</Text>
+        <Text variant='h2'>
+          {heading} hellooooo! {store.getState()}
+        </Text>
       </CardHeader>
       <CardContent>
         <StyledClearBtn hide={displayMode === 'DISPLAY_ONLY' || bFreeFormDrawing}>
